@@ -1,0 +1,12 @@
+
+
+关于Person的类型（representation）::
+Yes, it can be a string (though you should think carefully about whether that's a good representation).  
+But it doesn't have to be string.  Without defining a parsePerson function, it would have to be a string.
+
+
+Assume culprits and lineup are always two people?
+ 
+We won't give any test cases with invalid inputs, so from the standpoint of 
+ng tests, you don't need to test these things.  But from the standpoint of 
+code quality, you should ensure inputs are valid.
