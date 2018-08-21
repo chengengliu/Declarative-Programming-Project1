@@ -5,9 +5,8 @@ import Data.List
 type Height = Char
 type HairColor = Char
 type Sex = Char
-data Person = Person Height HairColor Sex 
+data Person = Person [String]
         deriving Show
-
 
 type Score = (Int, Int, Int, Int)
 
@@ -20,8 +19,15 @@ main = do
 
 parsePerson :: String -> Maybe Person 
 parsePerson [] = Nothing
-parsePerson (h:hc:s:[]) = Just (Person h hc s)
+parsePerson (h:hc:s:[]) = Just (Person [h:hc:s:[]])
 
+{-height :: Person -> Char
+height (h:hc:s:[]) = h-}
 
-
---initialGuess :: 
+{-
+initialGuess :: ([Person], GameState)
+initialGuess = (guess, state)
+         where 
+            
+            guess = Person "SBM"-}
+              
