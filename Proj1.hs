@@ -55,24 +55,36 @@ initialGuess = ([guess], state)
 
 -- Ideally this function should return the score given two inputs, one is the culprits and the other
 -- is the lineup.
-feedback :: [Person] -> [Person] -> (Int, Int, Int, Int, Char )
+feedback :: [Person] -> [Person] -> (Int, Int, Int, Int, [[String]])
 feedback culprits lineups = 
-    (totalCorrect, correctHeight, correctColor, correctSex, height')
+    (totalCorrect, correctHeight, correctColor, correctSex, deleteFirstsBy (areTheSame height) guess culprits)
     where 
       guess = nub lineups 
+      totalNumber = length guess
       totalCorrect = length $ intersect guess culprits 
+
+
       -- ** I need to figure our a way to calculate the correct numebrs. 
       -- ** The problem here is that how to determine the correct three things. 
+      (height, hairColor, sex) = (0,1,2)
 
-      height' = height $ culprits !! 0 
-      --heightComparison = 
-      correctHeight = 1
+      correctHeight = 
+
+      {-Not Working. 
+      correctHeight = totalNumber -
+                      length(deleteFirstsBy (areTheSame height) guess culprits) - 
+                      totalCorrect-}
       correctColor = 1
       correctSex = 1
-  
-areTheSame :: Ord a => [a] -> [a] -> Int -> Bool
-areTheSame first second n =  (first !! n ) == (second !! n)
 
+-- Given two lists and the postion we are interested in, return true
+-- If and only if the nth element in two lists are the same. 
+  -- Helper function 
+areTheSame :: Ord a => Int -> [a] -> [a] -> Bool
+areTheSame n first second  =  (first !! n ) == (second !! n)
+-- 我知道了 问题出在了对 areTheSame的这里。 判断有问题。
+-- input的type是 [[[Char]]], 也就是list of list of string，三层的char。这里areTheSame比较的
+-- 是以为个人为单位的相同。而我们这里需要的是以字母为单位的比较的函数。 
 
 main = do 
     let person = (parsePerson "ABC")
@@ -90,5 +102,9 @@ main = do
         l2 = [["TRF"], ["SBF"]]
         c3 = [["SBM"], ["SBF"]]
         l3 = [["TRF"], ["TRM"]]
+        c4 = [["SBM"], ["TDf"]]
+        l4 = [["TRF"], ["SDM"]]
     print (feedback c1 l1)
+    print $ feedback c2 l2
     print $ feedback c3 l3
+    print $ feedback c4 l4
