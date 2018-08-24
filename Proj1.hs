@@ -38,7 +38,7 @@ sex ([h:hc:s:[]]) = s
 initialGuess :: ([Person], State)
 initialGuess = (guess, state)
          where     
-          allPeople= [ [h,hc,s] | h<-["S","T"], hc<- ["B", "R","D"], s<-["M","F"] ] 
+          allPeople= [ [h,hc,s] | h<-['S','T'], hc<- ['B','R','D'], s<-['M','F'] ] 
           --  如果是 allPeople = Person ([[h,hc,s]| h<-['S','T'], hc<- ['B','R','D'], s<-['M','F']])
           --  这样写就不行。很奇怪。。没法消除掉这个guess
           guess = [["S","B","M"]]
