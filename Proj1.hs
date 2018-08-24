@@ -65,9 +65,14 @@ feedback culprits lineups =
       -- ** The problem here is that how to determine the correct three things. 
 
       height' = height $ culprits !! 0 
+      --heightComparison = 
       correctHeight = 1
       correctColor = 1
       correctSex = 1
+  
+areTheSame :: Ord a => [a] -> [a] -> Int -> Bool
+areTheSame first second n =  (first !! n ) == (second !! n)
+
 
 main = do 
     let person = (parsePerson "ABC")
@@ -79,6 +84,11 @@ main = do
 
 
     -- Unit test for feedback  
-    let c1 = [["SBM"], ["SBF"]]
-    let l1 = [["SBM"], ["TRF"]]
+    let c1 = [["SBM"], ["SBF"]] 
+        l1 = [["SBM"], ["TRF"]]
+        c2 = [["SBM"], ["SBF"]]
+        l2 = [["TRF"], ["SBF"]]
+        c3 = [["SBM"], ["SBF"]]
+        l3 = [["TRF"], ["TRM"]]
     print (feedback c1 l1)
+    print $ feedback c3 l3
