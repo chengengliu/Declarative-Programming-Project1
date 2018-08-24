@@ -8,13 +8,12 @@ type Height = Char
 type HairColor = Char
 type Sex = Char
 type Person = [String]
-type State = [Person]
+type GameState = [Person]
 
 type Score = (Int, Int, Int, Int)
 
-data GameState = GameState [Person]
-        deriving (Show,Eq,Ord)
-
+--data GameState = GameState [Person]
+--        deriving (Show,Eq,Ord)
 
 {-
 takes a three-character string and returns Just p, where p is the person specified by that string. 
@@ -35,23 +34,51 @@ sex :: Person -> Char
 sex ([h:hc:s:[]]) = s
 
 
-initialGuess :: ([Person], State)
+initialGuess :: ([Person], GameState)
 initialGuess = ([guess], state)
          where     
           allPeople= [ [h,hc,s] | h<-['S','T'], hc<- ['B','R','D'], s<-['M','F'] ] 
           guess = ["SBM"]
           state = [allPeople \\ guess]
+
+          -- 夜访吸血鬼
           -- allPeople :: Person 
             {-allPeople = Person ([[h,hc,s]| h<-['S','T'], hc<- ['B','R','D'], s<-['M','F']])
             onePossible = Person ["SBM"]
             guess = [OnePossible]    -- guess :: [Person]
             state = GameState ([allPeople] \\ [Person ["SBF"]])     -- GameState needs a list of Person. -}
-            
+          
+
+--nextguess :: ([Person], GameState) -> (Int,Int,Int,Int) -> ([Person], GameState)
+
+
+
+-- Ideally this function should return the score given two inputs, one is the culprits and the other
+-- is the lineup.
+feedback :: [Person] -> [Person] -> (Int, Int, Int, Int, Char )
+feedback culprits lineups = 
+    (totalCorrect, correctHeight, correctColor, correctSex, height')
+    where 
+      guess = nub lineups 
+      totalCorrect = length $ intersect guess culprits 
+      -- ** I need to figure our a way to calculate the correct numebrs. 
+      -- ** The problem here is that how to determine the correct three things. 
+
+      height' = height $ culprits !! 0 
+      correctHeight = 1
+      correctColor = 1
+      correctSex = 1
 
 main = do 
     let person = (parsePerson "ABC")
     --let (people, gamestate, allPeople) = initialGuess
-    print (1)
-    print (parsePerson "abc")
-    print (hair (fromJust person))
-    print (initialGuess )
+    --print (1)
+    --print (parsePerson "abc")
+    --print (hair (fromJust person))
+    --print (initialGuess )
+
+
+    -- Unit test for feedback  
+    let c1 = [["SBM"], ["SBF"]]
+    let l1 = [["SBM"], ["TRF"]]
+    print (feedback c1 l1)
