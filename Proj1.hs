@@ -48,11 +48,6 @@ initialGuess = (guess, state)
             guess = [OnePossible]    -- guess :: [Person]
             state = GameState ([allPeople] \\ [Person ["SBF"]])     -- GameState needs a list of Person. -}
           
-
---nextguess :: ([Person], GameState) -> (Int,Int,Int,Int) -> ([Person], GameState)
-
-
-
 -- Ideally this function should return the score given two inputs, one is the culprits and the other
 -- is the lineup.
 feedback :: [Person] -> [Person] -> (Int, Int , Int, Int)
@@ -81,11 +76,35 @@ feedback culprits lineups =
 -- Given two lists and the postion we are interested in, return true
 -- If and only if the nth element in two lists are the same. 
   -- Helper function 
+  --Add a function reused for calculating the final score. 
+
+
+
+
 areTheSame :: Int -> Person -> Person -> Bool
 areTheSame n first second  =  (first !! n) == (second !! n )
 -- 我知道了 问题出在了对 areTheSame的这里。 判断有问题。
 -- input的type是 [[[Char]]], 也就是list of list of string，三层的char。这里areTheSame比较的
 -- 是以为个人为单位的相同。而我们这里需要的是以字母为单位的比较的函数。 
+
+
+--nextguess :: ([Person], GameState) -> Score -> ([Person], GameState)
+
+
+
+
+utilityState ::  [Person] -> GameState -> Double
+utilityState culprits states = 
+  sum [ nt/ totalCombinations | g <-individuals, let nt = (fromIntegral . length) g]
+  where
+    scores =  [score | guess <- states, let score = feedback culprits  [guess]]
+    totalCombinations = (fromIntegral . length) scores
+    individuals = (sort.group) scores
+
+
+
+
+
 
 main = do 
     let person = (parsePerson "ABC")
