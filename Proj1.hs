@@ -68,7 +68,7 @@ feedback culprits lineups =
       -- ** The problem here is that how to determine the correct three things. 
       (height, hairColor, sex) = (0,1,2)
 
-      correctHeight =  
+      correctHeight =1  
 
 
 
