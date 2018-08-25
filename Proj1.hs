@@ -55,39 +55,28 @@ initialGuess = (guess, state)
 
 -- Ideally this function should return the score given two inputs, one is the culprits and the other
 -- is the lineup.
-feedback :: [Person] -> [Person] -> (Int, Int , Int, Int, [Person], [Person ])
+feedback :: [Person] -> [Person] -> (Int, Int , Int, Int)
 feedback culprits lineups = 
-    (totalCorrect, correctHeight, correctColor, correctSex, culprits, lineups)
+    (totalCorrect, correctHeight, correctColor, correctSex)
     where 
       guess = nub lineups 
       totalNumber = length guess
       totalCorrect = length $ intersect guess culprits 
 
-
-      -- ** I need to figure our a way to calculate the correct numebrs. 
-      -- ** The problem here is that how to determine the correct three things. 
       (height, hairColor, sex) = (0,1,2)
-
+      --The deleteFirstsBy function takes a predicate and two lists and returns the first list with the first occurrence of each element of the second list removed.
       correctHeight =  totalNumber -
         length (deleteFirstsBy (areTheSame height) culprits lineups)-
         totalCorrect
       correctColor = totalNumber -
         length (deleteFirstsBy (areTheSame hairColor) culprits lineups)-
         totalCorrect
-      correctSex = totalNumber -
+      correctSex = totalNumber - 
         length (deleteFirstsBy (areTheSame sex) culprits lineups)-
         totalCorrect
 
-        
+
         --[c | c1<- culprits, l1 <- lineups, let c =areTheSame height c1 l1]
-
-
-
-
-      {-Not Working. 
-      correctHeight = totalNumber -
-                      length(deleteFirstsBy (areTheSame height) guess culprits) - 
-                      totalCorrect-}
 
 -- Given two lists and the postion we are interested in, return true
 -- If and only if the nth element in two lists are the same. 
@@ -111,10 +100,10 @@ main = do
     let c1 = ["SBM", "SBF"]
         l1 = ["SBM", "TRF"]
         c2 = ["SBM", "SBF"]
-        l2 = ["TRF", "SBF"]
+        l2 = ["TRF", "SBM"]
         c3 = ["SBM", "SBF"]
         l3 = ["TRF", "TRM"]
-        c4 = ["SBM", "TDf"]
+        c4 = ["SBM", "TDF"]
         l4 = ["TRF", "SDM"]
     print (feedback c1 l1 ) 
     --print (c1, l1)
