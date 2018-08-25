@@ -55,9 +55,9 @@ initialGuess = (guess, state)
 
 -- Ideally this function should return the score given two inputs, one is the culprits and the other
 -- is the lineup.
-feedback :: [Person] -> [Person] -> (Int, Int, Int, Int)
+feedback :: [Person] -> [Person] -> (Int, Int , Int, Int, [Person], [Person ])
 feedback culprits lineups = 
-    (totalCorrect, correctHeight, correctColor, correctSex)
+    (totalCorrect, correctHeight, correctColor, correctSex, culprits, lineups)
     where 
       guess = nub lineups 
       totalNumber = length guess
@@ -68,18 +68,26 @@ feedback culprits lineups =
       -- ** The problem here is that how to determine the correct three things. 
       (height, hairColor, sex) = (0,1,2)
 
-      correctHeight =1  
+      correctHeight =  totalNumber -
+        length (deleteFirstsBy (areTheSame height) culprits lineups)-
+        totalCorrect
+      correctColor = totalNumber -
+        length (deleteFirstsBy (areTheSame hairColor) culprits lineups)-
+        totalCorrect
+      correctSex = totalNumber -
+        length (deleteFirstsBy (areTheSame sex) culprits lineups)-
+        totalCorrect
+
+        
+        --[c | c1<- culprits, l1 <- lineups, let c =areTheSame height c1 l1]
 
 
 
-      --[m | c1<-culprits, l1<-lineups, filter (areTheSame height c1) l1]
 
       {-Not Working. 
       correctHeight = totalNumber -
                       length(deleteFirstsBy (areTheSame height) guess culprits) - 
                       totalCorrect-}
-      correctColor = 1
-      correctSex = 1
 
 -- Given two lists and the postion we are interested in, return true
 -- If and only if the nth element in two lists are the same. 
@@ -108,7 +116,11 @@ main = do
         l3 = ["TRF", "TRM"]
         c4 = ["SBM", "TDf"]
         l4 = ["TRF", "SDM"]
-    print (feedback c1 l1)
+    print (feedback c1 l1 ) 
+    --print (c1, l1)
     print $ feedback c2 l2
+    --print (c2, l2)
     print $ feedback c3 l3
+    --print (c3, l3)
     print $ feedback c4 l4
+    --print (c4, l4)
