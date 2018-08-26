@@ -28,20 +28,20 @@ sex (h:hc:s:[]) = s
 initialGuess :: ([Person], GameState)
 initialGuess = (guess, state)
          where     
-          allPeople= [ [h,hc,s] | h<-['S','T'], hc<- ['B','R','D'], s<-['M','F'] ] 
-          guess = ["SBM"]
-          state = [allPeople \\ guess]
+          allPeople= [ [h,hc,s] | h<-['S','T'], hc<- ['B','R','D'], s<-['M','F'] ]
+          higherFormPeople = [guess | guess <- subsequences allPeople, length guess == 2] 
+          guess = ["SBM", "TRF"]
+          state = higherFormPeople \\ [guess]
       
 -- Ideally this function should return the score given two inputs, one is the culprits and the other
 -- is the lineup.
-feedback :: Guess -> Guess -> (Int, Int , Int, Int)
+feedback :: Guess -> Guess -> Score
 feedback culprits lineups = 
     (totalCorrect, correctHeight, correctColor, correctSex)
     where 
       guess = nub lineups 
       totalNumber = length guess
       totalCorrect = length $ intersect guess culprits 
-
       (height, hairColor, sex) = (0,1,2)
       -- The deleteFirstsBy function takes a predicate and two lists and returns the first list with 
       -- the first occurrence of each element of the second list removed.
@@ -54,9 +54,6 @@ feedback culprits lineups =
       correctSex = totalNumber - 
         length (deleteFirstsBy (areTheSame sex) culprits lineups)-
         totalCorrect
-
-
-        --[c | c1<- culprits, l1 <- lineups, let c =areTheSame height c1 l1]
 
 -- Given two lists and the postion we are interested in, return true
 -- If and only if the nth element in two lists are the same. 
@@ -73,7 +70,7 @@ nextGuess :: ([Person],GameState) -> (Int,Int,Int,Int) -> ([Person],GameState)
 nextGuess (lastGuess, state) score = (newGuess, newState)
   where 
     newState = delete lastGuess [candidate | candidate <- state,
-      feedback candidate lastGuess == score]
+      feedback lastGuess candidate == score]
     newGuess  = selectGuess newState
 
 
@@ -117,6 +114,7 @@ main = do
         l3 = ["TRF", "TRM"]
         c4 = ["SBM", "TDF"]
         l4 = ["TRF", "SDM"]
+    print (parsePerson "abc")
     print (feedback c1 l1 ) 
     --print (c1, l1)
     print $ feedback c2 l2
