@@ -69,14 +69,29 @@ areTheSame n first second  =  (first !! n) == (second !! n )
 -- Person:: [Char]
 -- [Person] :: [[Char]]
 -- GameState :: [Person]  == [[Char]]
---nextGuess :: ([Person],GameState) -> (Int,Int,Int,Int) -> ([Person],GameState)
---nextGuess (lastGuess, state) ->   
+nextGuess :: ([Person],GameState) -> (Int,Int,Int,Int) -> ([Person],GameState)
+nextGuess (lastGuess, state) score = (head newGuess, newState)
+  
 
 
+selectGuess :: GameState -> Guess 
+selectGuess state = fst (head guess)
+  where 
+    candidates = [(goal, candidate)
+    | goal <- state, 
+    let currentState = state \\ [goal],
+    let candidate = utilityState goal currentState
+    ]
+    guess = 
+
+  
 
 
-
-
+guessJudge :: Eq a => (a->a) -> [a] -> [a] -> Int -> Bool
+guessJudge f x y n = length(xs \\ ys) == 2 -n
+    where 
+      xs = map f x
+      ys = map f y 
 
 
 -- Get a utility function to judge the effectness of a guess by calculating
