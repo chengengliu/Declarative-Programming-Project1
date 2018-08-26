@@ -77,21 +77,26 @@ feedback culprits lineups =
 -- If and only if the nth element in two lists are the same. 
   -- Helper function 
   --Add a function reused for calculating the final score. 
-
-
-
-
 areTheSame :: Int -> Person -> Person -> Bool
 areTheSame n first second  =  (first !! n) == (second !! n )
 -- 我知道了 问题出在了对 areTheSame的这里。 判断有问题。
 -- input的type是 [[[Char]]], 也就是list of list of string，三层的char。这里areTheSame比较的
 -- 是以为个人为单位的相同。而我们这里需要的是以字母为单位的比较的函数。 
-
-
---nextguess :: ([Person], GameState) -> Score -> ([Person], GameState)
-
-
-
+nextGuess :: ([Person], GameState) -> Score -> ([Person], GameState)
+nextGuess (last, state) score = (next, newState)
+  where 
+    newState = delete last [ p | p<- state, feedback [p] last == score ]
+    next = bestGuess
+        where 
+          bestGuess = take 1 $ head $ sortBy(compare `on` snd ) afterDele
+          afterDele = [(culprits, lineups) |
+            culprits <- newState, 
+            let deleteState = newState \\ [culprits],
+            let lineups = utilityState culprits deleteState]
+      
+-- Get a utility function to judge the effectness of a guess by calculating
+-- the remaining percentage of possible guesses. 
+-- The samll number is, the better efficiency it is. 
 
 utilityState ::  [Person] -> GameState -> Double
 utilityState culprits states = 
@@ -100,10 +105,6 @@ utilityState culprits states =
     scores =  [score | guess <- states, let score = feedback culprits  [guess]]
     totalCombinations = (fromIntegral . length) scores
     individuals = (sort.group) scores
-
-
-
-
 
 
 main = do 
