@@ -7,9 +7,9 @@ import Data.Function
 type Height = Char
 type HairColor = Char
 type Sex = Char
-type Person = String  -- Deceide to treat Person as a list of char[Char]. Rather than list of list of char.([String])
-type GameState = [Person]
-
+type Person = String  -- [Char]
+type Guess = [Person] -- [[Char]] == [String ]
+type GameState = [Guess] -- [[[Char]]]
 type Score = (Int, Int, Int, Int)
 
 --data GameState = GameState [Person]
@@ -78,19 +78,16 @@ areTheSame n first second  =  (first !! n) == (second !! n )
 -- Person:: [Char]
 -- [Person] :: [[Char]]
 -- GameState :: [Person]  == [[Char]]
-nextGuess :: ([Person], GameState) -> Score -> ([Person], GameState)
-nextGuess (lastGuess, state) score = (next, newState)
-  where 
-    --state is [String] lastGuess is [String]
-    newState = delete lastGuess [ p | p<- [state], feedback p lastGuess == score ]
-    next = bestGuess
-        where 
-          bestGuess = take 1 $ head $ sortBy(compare `on` snd ) afterDele
-          afterDele = [(culprits, lineups) |
-            culprits <- newState, 
-            let deleteState = newState \\ [culprits],
-            let lineups = utilityState culprits deleteState]
-      
+--nextGuess :: ([Person],GameState) -> (Int,Int,Int,Int) -> ([Person],GameState)
+--nextGuess (lastGuess, state) ->   
+
+
+
+
+
+
+
+
 -- Get a utility function to judge the effectness of a guess by calculating
 -- the remaining percentage of possible guesses. 
 -- The samll number is, the better efficiency it is. 
@@ -99,7 +96,7 @@ utilityState ::  [Person] -> GameState -> Double
 utilityState culprits states = 
   sum [ nt/ totalCombinations | g <-individuals, let nt = (fromIntegral . length) g]
   where
-    scores =  [score | guess <- states, let score = feedback culprits  [guess]]
+    scores =  [score | guess <- states, let score = feedback culprits guess]
     totalCombinations = (fromIntegral . length) scores
     individuals = (sort.group) scores
 
@@ -110,7 +107,7 @@ main = do
     --print (1)
     --print (parsePerson "abc")
     --print (hair (fromJust person))
-    --print (initialGuess )
+    print (initialGuess )
 
 
     -- Unit test for feedback  
