@@ -1,5 +1,5 @@
---module Proj1 (Person, parsePerson, height, hair, sex,
-  --            GameState, initialGuess, nextGuess, feedback) where
+module Proj1 (Person, parsePerson, height, hair, sex,
+              GameState, initialGuess, nextGuess, feedback) where
 import Data.List
 import Data.Maybe
 import Data.Function
@@ -70,23 +70,26 @@ areTheSame n first second  =  (first !! n) == (second !! n )
 -- [Person] :: [[Char]]
 -- GameState :: [Person]  == [[Char]]
 nextGuess :: ([Person],GameState) -> (Int,Int,Int,Int) -> ([Person],GameState)
-nextGuess (lastGuess, state) score = (head newGuess, newState)
-  
+nextGuess (lastGuess, state) score = (newGuess, newState)
+  where 
+    newState = delete lastGuess [candidate | candidate <- state,
+      feedback candidate lastGuess == score]
+    newGuess  = selectGuess newState
 
 
 selectGuess :: GameState -> Guess 
 selectGuess state = fst (head guess)
   where 
     candidates = [(goal, candidate)
-    | goal <- state, 
-    let currentState = state \\ [goal],
-    let candidate = utilityState goal currentState
-    ]
-    guess = 
-
-  
+      | goal <- state, 
+      let currentState = state \\ [goal],
+      let candidate = utilityState goal currentState]
+    guess = sortBy(compare `on` snd ) candidates
 
 
+
+
+-- (May not be useful)
 guessJudge :: Eq a => (a->a) -> [a] -> [a] -> Int -> Bool
 guessJudge f x y n = length(xs \\ ys) == 2 -n
     where 
