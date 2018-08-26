@@ -2,7 +2,7 @@
   --            GameState, initialGuess, nextGuess, feedback) where
 import Data.List
 import Data.Maybe
-import Debug.Trace
+import Data.Function
 
 type Height = Char
 type HairColor = Char
@@ -40,14 +40,7 @@ initialGuess = (guess, state)
           allPeople= [ [h,hc,s] | h<-['S','T'], hc<- ['B','R','D'], s<-['M','F'] ] 
           guess = ["SBM"]
           state = allPeople \\ guess
-
-          -- 夜访吸血鬼
-          -- allPeople :: Person 
-            {-allPeople = Person ([[h,hc,s]| h<-['S','T'], hc<- ['B','R','D'], s<-['M','F']])
-            onePossible = Person ["SBM"]
-            guess = [OnePossible]    -- guess :: [Person]
-            state = GameState ([allPeople] \\ [Person ["SBF"]])     -- GameState needs a list of Person. -}
-          
+      
 -- Ideally this function should return the score given two inputs, one is the culprits and the other
 -- is the lineup.
 feedback :: [Person] -> [Person] -> (Int, Int , Int, Int)
@@ -59,7 +52,8 @@ feedback culprits lineups =
       totalCorrect = length $ intersect guess culprits 
 
       (height, hairColor, sex) = (0,1,2)
-      --The deleteFirstsBy function takes a predicate and two lists and returns the first list with the first occurrence of each element of the second list removed.
+      -- The deleteFirstsBy function takes a predicate and two lists and returns the first list with 
+      -- the first occurrence of each element of the second list removed.
       correctHeight =  totalNumber -
         length (deleteFirstsBy (areTheSame height) culprits lineups)-
         totalCorrect
@@ -79,13 +73,16 @@ feedback culprits lineups =
   --Add a function reused for calculating the final score. 
 areTheSame :: Int -> Person -> Person -> Bool
 areTheSame n first second  =  (first !! n) == (second !! n )
--- 我知道了 问题出在了对 areTheSame的这里。 判断有问题。
--- input的type是 [[[Char]]], 也就是list of list of string，三层的char。这里areTheSame比较的
--- 是以为个人为单位的相同。而我们这里需要的是以字母为单位的比较的函数。 
+
+
+-- Person:: [Char]
+-- [Person] :: [[Char]]
+-- GameState :: [Person]  == [[Char]]
 nextGuess :: ([Person], GameState) -> Score -> ([Person], GameState)
-nextGuess (last, state) score = (next, newState)
+nextGuess (lastGuess, state) score = (next, newState)
   where 
-    newState = delete last [ p | p<- state, feedback [p] last == score ]
+    --state is [String] lastGuess is [String]
+    newState = delete lastGuess [ p | p<- [state], feedback p lastGuess == score ]
     next = bestGuess
         where 
           bestGuess = take 1 $ head $ sortBy(compare `on` snd ) afterDele
