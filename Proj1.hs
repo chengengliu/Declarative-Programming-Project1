@@ -86,17 +86,6 @@ selectGuess state = fst (head guess)
       let candidate = utilityState goal currentState]
     guess = sortBy(compare `on` snd ) candidates
 
-
-
-
--- (May not be useful)
-guessJudge :: Eq a => (a->a) -> [a] -> [a] -> Int -> Bool
-guessJudge f x y n = length(xs \\ ys) == 2 -n
-    where 
-      xs = map f x
-      ys = map f y 
-
-
 -- Get a utility function to judge the effectness of a guess by calculating
 -- the remaining percentage of possible guesses. 
 -- The samll number is, the better efficiency it is. 
