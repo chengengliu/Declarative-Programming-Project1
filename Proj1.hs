@@ -9,12 +9,8 @@ type HairColor = Char
 type Sex = Char
 type Person = String  -- [Char]
 type Guess = [Person] -- [[Char]] == [String ]
-type GameState = [Guess] -- [[[Char]]]
+type GameState = [Guess] -- [[[Char]]]   GameState Should be [[Person]] (from Zijun)
 type Score = (Int, Int, Int, Int)
-
---data GameState = GameState [Person]
---        deriving (Show,Eq,Ord)
-
 {-
 takes a three-character string and returns Just p, where p is the person specified by that string. 
 If an invalid string is provided, returns Nothing.
@@ -22,28 +18,23 @@ If an invalid string is provided, returns Nothing.
 parsePerson :: String -> Maybe Person 
 parsePerson [] = Nothing
 parsePerson (h:hc:s:[]) = Just [h,hc,s]
-
-
 height :: Person -> Char
 height (h:hc:s:[]) = h 
-
 hair :: Person -> Char 
 hair (h:hc:s:[]) = hc
-
 sex :: Person -> Char 
 sex (h:hc:s:[]) = s
-
 
 initialGuess :: ([Person], GameState)
 initialGuess = (guess, state)
          where     
           allPeople= [ [h,hc,s] | h<-['S','T'], hc<- ['B','R','D'], s<-['M','F'] ] 
           guess = ["SBM"]
-          state = allPeople \\ guess
+          state = [allPeople \\ guess]
       
 -- Ideally this function should return the score given two inputs, one is the culprits and the other
 -- is the lineup.
-feedback :: [Person] -> [Person] -> (Int, Int , Int, Int)
+feedback :: Guess -> Guess -> (Int, Int , Int, Int)
 feedback culprits lineups = 
     (totalCorrect, correctHeight, correctColor, correctSex)
     where 
@@ -92,7 +83,7 @@ areTheSame n first second  =  (first !! n) == (second !! n )
 -- the remaining percentage of possible guesses. 
 -- The samll number is, the better efficiency it is. 
 
-utilityState ::  [Person] -> GameState -> Double
+utilityState ::  Guess -> GameState -> Double
 utilityState culprits states = 
   sum [ nt/ totalCombinations | g <-individuals, let nt = (fromIntegral . length) g]
   where
