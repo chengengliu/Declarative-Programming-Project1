@@ -3,18 +3,17 @@ module Proj1 (Person, parsePerson, height, hair, sex,
 import Data.List
 import Data.Maybe
 import Data.Function
+import Debug.Trace
 
 type Height = Char
 type HairColor = Char
 type Sex = Char
 type Person = String  -- [Char]
 type Guess = [Person] -- [[Char]] == [String ]
-type GameState = [Guess] -- [[[Char]]]   GameState Should be [[Person]] (from Zijun)
+type GameState = [Guess] -- [[[Char]]]  == [[Person]]
 type Score = (Int, Int, Int, Int)
-{-
-takes a three-character string and returns Just p, where p is the person specified by that string. 
-If an invalid string is provided, returns Nothing.
--}
+----------------------------------------------------------------------------------------------
+-- Helper Function 
 parsePerson :: String -> Maybe Person 
 parsePerson [] = Nothing
 parsePerson (h:hc:s:[]) = Just [h,hc,s]
@@ -24,17 +23,22 @@ hair :: Person -> Char
 hair (h:hc:s:[]) = hc
 sex :: Person -> Char 
 sex (h:hc:s:[]) = s
-
+----------------------------------------------------------------------------------------------
+-- Make an initial guess, hardcode for the first guess as there is not enough information about
+-- it.
 initialGuess :: ([Person], GameState)
-initialGuess = (guess, state)
+initialGuess = (initialGuess, state)
          where     
-          allPeople= [ [h,hc,s] | h<-['S','T'], hc<- ['B','R','D'], s<-['M','F'] ]
-          higherFormPeople = [guess | guess <- subsequences allPeople, length guess == 2] 
-          guess = ["SBM", "TRF"]
-          state = higherFormPeople \\ [guess]
+          combinations= [ [h,hc,s] | h<-['S','T'], hc<- ['B','R','D'], s<-['M','F'] ]
+          allPeople = [guess | guess <- subsequences combinations, length guess == 2] 
+          initialGuess = ["SBM", "TRF"]
+          state = allPeople \\ [guess]
       
+          
 -- Ideally this function should return the score given two inputs, one is the culprits and the other
 -- is the lineup.
+
+-- Done unit test already. Feedback should work correctly. 
 feedback :: Guess -> Guess -> Score
 feedback culprits lineups = 
     (totalCorrect, correctHeight, correctColor, correctSex)
@@ -87,9 +91,10 @@ selectGuess state = fst (head guess)
 -- the remaining percentage of possible guesses. 
 -- The samll number is, the better efficiency it is. 
 
+
 utilityState ::  Guess -> GameState -> Double
 utilityState culprits states = 
-  sum [ nt/ totalCombinations | g <-individuals, let nt = (fromIntegral . length) g]
+  sum [ (nt/ totalCombinations)*nt | g <-individuals, let nt = (fromIntegral . length) g]
   where
     scores =  [score | guess <- states, let score = feedback culprits guess]
     totalCombinations = (fromIntegral . length) scores
