@@ -3,7 +3,6 @@ module Proj1 (Person, parsePerson, height, hair, sex,
 import Data.List
 import Data.Maybe
 import Data.Function
-import Debug.Trace
 
 type Height = Char
 type HairColor = Char
@@ -32,7 +31,7 @@ initialGuess = (initialGuess, state)
           combinations= [ [h,hc,s] | h<-['S','T'], hc<- ['B','R','D'], s<-['M','F'] ]
           allPeople = [guess | guess <- subsequences combinations, length guess == 2] 
           initialGuess = ["SBM", "TRF"]
-          state = allPeople \\ [guess]
+          state = allPeople \\ [initialGuess]
       
           
 -- Ideally this function should return the score given two inputs, one is the culprits and the other
@@ -73,32 +72,36 @@ areTheSame n first second  =  (first !! n) == (second !! n )
 nextGuess :: ([Person],GameState) -> (Int,Int,Int,Int) -> ([Person],GameState)
 nextGuess (lastGuess, state) score = (newGuess, newState)
   where 
+    -- Cut the state such that only the guesses that 
+    -- have the same score will be remained. 
     newState = delete lastGuess [candidate | candidate <- state,
-      feedback lastGuess candidate == score]
+      feedback candidate lastGuess == score] 
     newGuess  = selectGuess newState
 
 
 selectGuess :: GameState -> Guess 
 selectGuess state = fst (head guess)
   where 
-    candidates = [(goal, candidate)
+    candidates = [(goal, utilityScore)
       | goal <- state, 
       let currentState = state \\ [goal],
-      let candidate = utilityState goal currentState]
-    guess = sortBy(compare `on` snd ) candidates
+      let utilityScore = utilityState goal currentState]
+    guess = sortBy(compare `on` snd ) candidates -- Sort all remaining choices based on the effeciency. 
 
 -- Get a utility function to judge the effectness of a guess by calculating
 -- the remaining percentage of possible guesses. 
 -- The samll number is, the better efficiency it is. 
 
 
-utilityState ::  Guess -> GameState -> Double
-utilityState culprits states = 
-  sum [ (nt/ totalCombinations)*nt | g <-individuals, let nt = (fromIntegral . length) g]
+utilityState ::  Guess -> GameState -> (Double, [Score]) 
+utilityState possibleSelection states = 
+  (sum [ (eachPossible/ totalCombinations)*eachPossible
+    | g <-groupLineups, let eachPossible = (fromIntegral . length) g], scores)
   where
-    scores =  [score | guess <- states, let score = feedback culprits guess]
+    scores =  [score | guess <- states, let score = feedback possibleSelection guess]
+    groupLineups = (group.sort) scores   
     totalCombinations = (fromIntegral . length) scores
-    individuals = (sort.group) scores
+    
 
 
 main = do 
