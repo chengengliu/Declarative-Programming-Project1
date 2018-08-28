@@ -34,10 +34,9 @@ initialGuess = (initialGuess, state)
           state = allPeople \\ [initialGuess]
       
           
--- Ideally this function should return the score given two inputs, one is the culprits and the other
+-- Return the score given two inputs, one is the culprits and the other
 -- is the lineup.
 
--- Done unit test already. Feedback should work correctly. 
 feedback :: Guess -> Guess -> Score
 feedback culprits lineups = 
     (totalCorrect, correctHeight, correctColor, correctSex)
@@ -67,6 +66,24 @@ areTheSame n first second  =  (first !! n) == (second !! n )
 -- Person:: [Char]
 -- [Person] :: [[Char]]
 -- GameState :: [Person]  == [[Char]]
+
+bestGuess :: Guess -> GameState -> Guess
+bestGuess lastGuess state = bestguess
+  where 
+    scoreList = [(guess, utilityScore)| guess <- state, 
+      let utilityScore = utility lastGuess state ]
+    guesses = sortBy (compare `on` snd)  scoreList
+    bestguess = fst $ head guesses
+
+
+utility :: Guess -> GameState -> Double
+utility lastGuess state =  sum [(numPos / total) * numPos| g<- grouped, let numPos = (fromIntegral .length) g]
+  where 
+    totalScores = [score | guess <- state, let score = feedback lastGuess guess]
+    total = (fromIntegral . length ) state
+    grouped = (group . sort ) totalScores 
+
+
 nextGuess :: ([Person],GameState) -> Score -> ([Person],GameState)
 nextGuess (lastGuess, state) score = (newGuess, newState)
   where 
@@ -74,37 +91,40 @@ nextGuess (lastGuess, state) score = (newGuess, newState)
     -- have the same score will be remained. 
     newState = delete lastGuess [candidate | candidate <- state,
       feedback candidate lastGuess == score] 
-    newGuess  = selectGuess newState
+    newGuess  = bestGuess lastGuess state 
+      -- selectGuess newState
 
 -- For each possible guesses in the remaining state, calculate the utility score 
 -- for the guess. Then based on the effeciency performance of each guess, select
 -- the most effect one ( with the most minimum possible candidates remaining. )
+{-
 selectGuess :: GameState -> Guess 
-selectGuess state = fst (head guess) -- The first one is the most effective. 
+selectGuess state = fst (head guesses) -- The first one is the most effective. 
   where 
-    candidates = [(goal, utilityScore)
-      | goal <- state, 
-      let currentState = state \\ [goal],
-      let utilityScore = utilityState goal currentState]
-    guess = sortBy(compare `on` snd ) candidates 
+    candidates = [(guess, utilityScore)
+      | guess <- state, 
+      let currentState = state \\ [guess],
+      let utilityScore = utilityCal guess currentState]
+    guesses = sortBy(compare `on` snd ) candidates 
     -- Sort all remaining choices based on the effeciency. 
 
-    
+
 -- Simply compute compute the average number of possible lineups that will 
 -- remain after each lineup by grouping guesses with the same feedback(scores).
 -- The smaller the number is, the more efficient the reduction is. 
 -- totslScores is [Score] after sorting and grouping, the number of the 
 -- same score will be calculated. 
-utilityState ::  Guess -> GameState -> Double 
-utilityState possibleSelection states = 
+utilityCal ::  Guess -> GameState -> Double 
+utilityCal possibleSelection states = 
   sum [ (eachPossNumber/ totalCombinations)*eachPossNumber
     | g <-groupLineups, let eachPossNumber = (fromIntegral . length) g]
   where
     totalScores =  [score | guess <- states, 
       let score = feedback possibleSelection guess]
+    totalCombinations = (fromIntegral . length) states
     groupLineups = (group.sort) totalScores   
-    totalCombinations = (fromIntegral . length) totalScores
-    
+
+-}
 
 
 main = do 
