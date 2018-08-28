@@ -91,13 +91,14 @@ nextGuess (lastGuess, state) score = (newGuess, newState)
     -- have the same score will be remained. 
     newState = delete lastGuess [candidate | candidate <- state,
       feedback candidate lastGuess == score] 
-    newGuess  = bestGuess lastGuess state 
+    newGuess  = selectGuess newState 
       -- selectGuess newState
 
--- For each possible guesses in the remaining state, calculate the utility score 
--- for the guess. Then based on the effeciency performance of each guess, select
--- the most effect one ( with the most minimum possible candidates remaining. )
-{-
+-- Compute the average number of possible lineups that will remain 
+--after each lineup.For each possible guesses in the remaining state, 
+-- calculate the utility score for the guess. Then based on the 
+--effeciency performance of each guess, select the most effect 
+--one ( with the most minimum possible candidates remaining. )
 selectGuess :: GameState -> Guess 
 selectGuess state = fst (head guesses) -- The first one is the most effective. 
   where 
@@ -109,8 +110,8 @@ selectGuess state = fst (head guesses) -- The first one is the most effective.
     -- Sort all remaining choices based on the effeciency. 
 
 
--- Simply compute compute the average number of possible lineups that will 
--- remain after each lineup by grouping guesses with the same feedback(scores).
+-- Simply compute expected number of remaining possible lineups for each guess
+-- by grouping guesses with the same feedback(scores).
 -- The smaller the number is, the more efficient the reduction is. 
 -- totslScores is [Score] after sorting and grouping, the number of the 
 -- same score will be calculated. 
@@ -124,7 +125,7 @@ utilityCal possibleSelection states =
     totalCombinations = (fromIntegral . length) states
     groupLineups = (group.sort) totalScores   
 
--}
+
 
 
 main = do 
