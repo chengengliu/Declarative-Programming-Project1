@@ -16,6 +16,7 @@ type Score = (Int, Int, Int, Int)
 parsePerson :: String -> Maybe Person 
 parsePerson [] = Nothing
 parsePerson (h:hc:s:[]) = Just [h,hc,s]
+
 height :: Person -> Char
 height (h:hc:s:[]) = h 
 hair :: Person -> Char 
@@ -27,11 +28,12 @@ sex (h:hc:s:[]) = s
 -- it.
 initialGuess :: ([Person], GameState)
 initialGuess = (initialGuess, state)
-         where     
-          combinations= [ [h,hc,s] | h<-['S','T'], hc<- ['B','R','D'], s<-['M','F'] ]
-          allPeople = [guess | guess <- subsequences combinations, length guess == 2] 
+         where
+          people = [fromJust (parsePerson (h ++ hc ++ s))
+            | h <-["S", "T"],hc <-["B", "R", "D"],s  <-["M", "F"]]
+          cases = [[a,b]| a<-people, b<- people, a<b]     
           initialGuess = ["SBM", "TRF"]
-          state = allPeople \\ [initialGuess]
+          state = cases \\ [initialGuess]
       
           
 -- Return the score given two inputs, one is the culprits and the other
@@ -57,8 +59,6 @@ feedback culprits lineups =
 
 -- Given two lists and the postion we are interested in, return true
 -- If and only if the nth element in two lists are the same. 
-  -- Helper function 
-  --Add a function reused for calculating the final score. 
 areTheSame :: Int -> Person -> Person -> Bool
 areTheSame n first second  =  (first !! n) == (second !! n )
 
@@ -92,7 +92,6 @@ nextGuess (lastGuess, state) score = (newGuess, newState)
     newState = delete lastGuess [candidate | candidate <- state,
       feedback candidate lastGuess == score] 
     newGuess  = selectGuess newState 
-      -- selectGuess newState
 
 -- Compute the average number of possible lineups that will remain 
 --after each lineup.For each possible guesses in the remaining state, 
@@ -100,13 +99,14 @@ nextGuess (lastGuess, state) score = (newGuess, newState)
 --effeciency performance of each guess, select the most effect 
 --one ( with the most minimum possible candidates remaining. )
 selectGuess :: GameState -> Guess 
-selectGuess state = fst (head guesses) -- The first one is the most effective. 
+selectGuess state = bestGuess -- The first one is the most effective. 
   where 
     candidates = [(guess, utilityScore)
       | guess <- state, 
       let currentState = state \\ [guess],
       let utilityScore = utilityCal guess currentState]
     guesses = sortBy(compare `on` snd ) candidates 
+    bestGuess = fst (head guesses)
     -- Sort all remaining choices based on the effeciency. 
 
 
