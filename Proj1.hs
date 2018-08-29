@@ -76,12 +76,6 @@ bestGuess lastGuess state = bestguess
     bestguess = fst $ head guesses
 
 
-utility :: Guess -> GameState -> Double
-utility lastGuess state =  sum [(numPos / total) * numPos| g<- grouped, let numPos = (fromIntegral .length) g]
-  where 
-    totalScores = [score | guess <- state, let score = feedback lastGuess guess]
-    total = (fromIntegral . length ) state
-    grouped = (group . sort ) totalScores 
 
 
 nextGuess :: ([Person],GameState) -> Score -> ([Person],GameState)
@@ -104,30 +98,27 @@ selectGuess state = bestGuess -- The first one is the most effective.
     candidates = [(guess, utilityScore)
       | guess <- state, 
       let currentState = state \\ [guess],
-      let utilityScore = utilityCal guess currentState]
+      let utilityScore = utility guess currentState]
     guesses = sortBy(compare `on` snd ) candidates 
     bestGuess = fst (head guesses)
     -- Sort all remaining choices based on the effeciency. 
-
 
 -- Simply compute expected number of remaining possible lineups for each guess
 -- by grouping guesses with the same feedback(scores).
 -- The smaller the number is, the more efficient the reduction is. 
 -- totslScores is [Score] after sorting and grouping, the number of the 
 -- same score will be calculated. 
-utilityCal ::  Guess -> GameState -> Double 
-utilityCal possibleSelection states = 
-  sum [ (eachPossNumber/ totalCombinations)*eachPossNumber
-    | g <-groupLineups, let eachPossNumber = (fromIntegral . length) g]
-  where
-    totalScores =  [score | guess <- states, 
-      let score = feedback possibleSelection guess]
-    totalCombinations = (fromIntegral . length) states
-    groupLineups = (group.sort) totalScores   
 
+utility :: Guess -> GameState -> Double
+utility lastGuess state =  sum [(numPos / total) * numPos| g<- groupedScores, 
+  let numPos = (fromIntegral .length) g]
+  where 
+    totalScores = [score | guess <- state, 
+      let score = feedback lastGuess guess]
+    total = (fromIntegral . length ) state
+    groupedScores = (group . sort ) totalScores 
 
-
-
+ 
 main = do 
     let person = (parsePerson "ABC")
     --let (people, gamestate, allPeople) = initialGuess
