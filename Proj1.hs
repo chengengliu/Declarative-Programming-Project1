@@ -1,3 +1,18 @@
+-- Chengeng Liu 
+-- Student ID : 813174
+-- Declarative Programming 
+
+-- This is a guessing game. There are two culprits and the program should 
+-- be able to catch the correct culprits as soon as possible by using the 
+-- minimum guesses. Each person has three features, height(S/T), haircolor
+-- (B/R/D) and sex (M/F). The 'feedback' function will output the score
+-- for the guess. The 'nextGuess' will generate the next best guess based
+-- on the last guess and the remaining possible guesses' performance. There 
+-- are several helper functions for the 'nextGuess' function in order to get
+-- a more precise guess. 
+
+------------------------------------------------------------------------------
+
 module Proj1 (Person, parsePerson, height, hair, sex,
               GameState, initialGuess, nextGuess, feedback) where
 import Data.List
@@ -11,7 +26,7 @@ type Person = String  -- [Char]
 type Guess = [Person] -- [[Char]] == [String ]
 type GameState = [Guess] -- [[[Char]]]  == [[Person]]
 type Score = (Int, Int, Int, Int)
-----------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 -- Helper Function 
 parsePerson :: String -> Maybe Person 
 parsePerson [] = Nothing
@@ -23,7 +38,7 @@ hair :: Person -> Char
 hair (h:hc:s:[]) = hc
 sex :: Person -> Char 
 sex (h:hc:s:[]) = s
-----------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 -- Make an initial guess, hardcode for the first guess as there is not enough information about
 -- it.
 initialGuess :: ([Person], GameState)
@@ -31,10 +46,11 @@ initialGuess = (initialGuess, state)
          where
           people = [fromJust (parsePerson (h ++ hc ++ s))
             | h <-["S", "T"],hc <-["B", "R", "D"],s  <-["M", "F"]]
-          cases = [[a,b]| a<-people, b<- people, a<b]     
-          initialGuess = ["SBM", "TRF"]
-          state = cases \\ [initialGuess]
+          allStates = [[a,b]| a<-people, b<- people, a<b]     
+          initialGuess = ["SBM", "TRM"]
+          state = allStates \\ [initialGuess]
       
+------------------------------------------------------------------------------
           
 -- Return the score given two inputs, one is the culprits and the other
 -- is the lineup.
@@ -56,11 +72,7 @@ feedback culprits lineups =
       correctSex = totalNumber - totalCorrect- 
         length (deleteFirstsBy (areTheSame sex) culprits lineups)
         
-
--- Given two lists and the postion we are interested in, return true
--- If and only if the nth element in two lists are the same. 
-areTheSame :: Int -> Person -> Person -> Bool
-areTheSame n first second  =  (first !! n) == (second !! n )
+------------------------------------------------------------------------------
 
 
 -- Person:: [Char]
@@ -77,7 +89,7 @@ bestGuess lastGuess state = bestguess
 
 
 
-
+------------------------------------------------------------------------------
 nextGuess :: ([Person],GameState) -> Score -> ([Person],GameState)
 nextGuess (lastGuess, state) score = (newGuess, newState)
   where 
@@ -92,6 +104,8 @@ nextGuess (lastGuess, state) score = (newGuess, newState)
 -- calculate the utility score for the guess. Then based on the 
 --effeciency performance of each guess, select the most effect 
 --one ( with the most minimum possible candidates remaining. )
+------------------------------------------------------------------------------
+
 selectGuess :: GameState -> Guess 
 selectGuess state = bestGuess -- The first one is the most effective. 
   where 
@@ -108,6 +122,7 @@ selectGuess state = bestGuess -- The first one is the most effective.
 -- The smaller the number is, the more efficient the reduction is. 
 -- totslScores is [Score] after sorting and grouping, the number of the 
 -- same score will be calculated. 
+------------------------------------------------------------------------------
 
 utility :: Guess -> GameState -> Double
 utility lastGuess state =  sum [(numPos / total) * numPos| g<- groupedScores, 
@@ -119,6 +134,14 @@ utility lastGuess state =  sum [(numPos / total) * numPos| g<- groupedScores,
     groupedScores = (group . sort ) totalScores 
 
  
+
+-- Given two lists and the postion we are interested in, return true
+-- If and only if the nth element in two lists are the same. 
+  areTheSame :: Int -> Person -> Person -> Bool
+  areTheSame n first second  =  (first !! n) == (second !! n )
+
+
+  
 main = do 
     let person = (parsePerson "ABC")
     --let (people, gamestate, allPeople) = initialGuess
