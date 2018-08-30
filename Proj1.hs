@@ -1,6 +1,6 @@
 -- Chengeng Liu 
 -- Student ID : 813174
--- Declarative Programming 
+-- Declarative Programming COMP30020
 
 -- This is a guessing game. There are two culprits and the program should 
 -- be able to catch the correct culprits as soon as possible by using the 
@@ -11,6 +11,13 @@
 -- are several helper functions for the 'nextGuess' function in order to get
 -- a more precise guess. 
 
+-- The data structure used in the program are 'Person', 'Guess', 'GameState'
+-- and 'Score'. Person is simply a list of char(String). It is used to 
+-- store each charactistic of the person. Guess is a list of Person ([Person])
+-- where Guess is suppossed to include two Persons at a time. GameStae is a 
+-- list of Guess ([Guess]), which should include the remaining possible 
+-- guesses. 
+
 ------------------------------------------------------------------------------
 
 module Proj1 (Person, parsePerson, height, hair, sex,
@@ -19,19 +26,18 @@ import Data.List
 import Data.Maybe
 import Data.Function
 
-type Height = Char
-type HairColor = Char
-type Sex = Char
 type Person = String  -- [Char]
 type Guess = [Person] -- [[Char]] == [String ]
 type GameState = [Guess] -- [[[Char]]]  == [[Person]]
 type Score = (Int, Int, Int, Int)
 ------------------------------------------------------------------------------
--- Helper Function 
+-- Helper Function.
+-- Given a string and transform the string into a 'Person' 
 parsePerson :: String -> Maybe Person 
 parsePerson [] = Nothing
 parsePerson (h:hc:s:[]) = Just [h,hc,s]
 
+-- Given a Person and return the information about the person.
 height :: Person -> Char
 height (h:hc:s:[]) = h 
 hair :: Person -> Char 
@@ -39,8 +45,9 @@ hair (h:hc:s:[]) = hc
 sex :: Person -> Char 
 sex (h:hc:s:[]) = s
 ------------------------------------------------------------------------------
--- Make an initial guess, hardcode for the first guess as there is not enough information about
--- it.
+-- Make an initial guess. Return the first guess and the game state after 
+-- selecting the first guess. 
+
 initialGuess :: ([Person], GameState)
 initialGuess = (initialGuess, state)
          where
@@ -51,9 +58,8 @@ initialGuess = (initialGuess, state)
           state = allStates \\ [initialGuess]
       
 ------------------------------------------------------------------------------
-          
--- Return the score given two inputs, one is the culprits and the other
--- is the lineup.
+-- Return the score given two inputs(guesses). Basically describe the accuracy
+-- of the guess. 
 
 feedback :: Guess -> Guess -> Score
 feedback culprits lineups = 
@@ -63,7 +69,8 @@ feedback culprits lineups =
       totalNumber = length guess
       totalCorrect = length $ intersect guess culprits 
       (height, hairColor, sex) = (0,1,2)
-      -- The deleteFirstsBy function takes a predicate and two lists and returns the first list with 
+      -- The deleteFirstsBy function takes a predicate and two lists and 
+      -- returns the first list with 
       -- the first occurrence of each element of the second list removed.
       correctHeight =  totalNumber - totalCorrect-
         length (deleteFirstsBy (areTheSame height) culprits lineups) 
@@ -90,6 +97,8 @@ bestGuess lastGuess state = bestguess
 
 
 ------------------------------------------------------------------------------
+
+
 nextGuess :: ([Person],GameState) -> Score -> ([Person],GameState)
 nextGuess (lastGuess, state) score = (newGuess, newState)
   where 
@@ -99,12 +108,12 @@ nextGuess (lastGuess, state) score = (newGuess, newState)
       feedback candidate lastGuess == score] 
     newGuess  = selectGuess newState 
 
--- Compute the average number of possible lineups that will remain 
---after each lineup.For each possible guesses in the remaining state, 
--- calculate the utility score for the guess. Then based on the 
---effeciency performance of each guess, select the most effect 
---one ( with the most minimum possible candidates remaining. )
 ------------------------------------------------------------------------------
+-- Compute the average number of possible lineups that will remain 
+-- after each lineup.For each possible guesses in the remaining state, 
+-- calculate the utility score for the guess. Then based on the 
+-- effeciency performance of each guess, select the most effect 
+-- one ( with the most minimum possible candidates remaining. )
 
 selectGuess :: GameState -> Guess 
 selectGuess state = bestGuess -- The first one is the most effective. 
@@ -134,14 +143,15 @@ utility lastGuess state =  sum [(numPos / total) * numPos| g<- groupedScores,
     groupedScores = (group . sort ) totalScores 
 
  
-
+------------------------------------------------------------------------------
 -- Given two lists and the postion we are interested in, return true
 -- If and only if the nth element in two lists are the same. 
-  areTheSame :: Int -> Person -> Person -> Bool
-  areTheSame n first second  =  (first !! n) == (second !! n )
-
-
   
+areTheSame :: Int -> Person -> Person -> Bool
+areTheSame n first second  =  (first !! n) == (second !! n )
+
+
+
 main = do 
     let person = (parsePerson "ABC")
     --let (people, gamestate, allPeople) = initialGuess
