@@ -46,8 +46,8 @@ hair (h:hc:s:[]) = hc
 sex :: Person -> Char 
 sex (h:hc:s:[]) = s
 ------------------------------------------------------------------------------
--- Make an initial guess. Return the first guess and the game state after 
--- selecting the first guess. 
+-- Make an initial guess. Generate all possible guesses and store in a state
+-- Return the first guess and the game state after selecting the first guess. 
 
 initialGuess :: ([Person], GameState)
 initialGuess = (initialGuess, state)
@@ -107,8 +107,7 @@ selectGuess state = bestGuess -- The first one is the most effective.
   where 
     candidates = [(guess, utilityScore)
       | guess <- state, 
-      let currentState = state \\ [guess],
-      let utilityScore = utility guess currentState]
+      let utilityScore = utility guess state]
     guesses = sortBy(compare `on` snd ) candidates 
     bestGuess = fst (head guesses)
     -- Sort all remaining choices based on the effeciency. 
