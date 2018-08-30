@@ -1,6 +1,7 @@
 -- Chengeng Liu 
 -- Student ID : 813174
 -- Declarative Programming COMP30020
+-- Start time : 20/8/2018
 
 -- This is a guessing game. There are two culprits and the program should 
 -- be able to catch the correct culprits as soon as possible by using the 
@@ -84,6 +85,7 @@ feedback culprits lineups =
 ------------------------------------------------------------------------------
 -- Select the next guess from the updated state, given the last guess and 
 -- last score. 
+
 nextGuess :: ([Person],GameState) -> Score -> ([Person],GameState)
 nextGuess (lastGuess, state) score = (newGuess, newState)
   where 
@@ -135,32 +137,3 @@ utility lastGuess state =  sum [(numPos / total) * numPos| g<- groupedScores,
 areTheSame :: Int -> Person -> Person -> Bool
 areTheSame n first second  =  (first !! n) == (second !! n )
 
-
-
-main = do 
-    let person = (parsePerson "ABC")
-    --let (people, gamestate, allPeople) = initialGuess
-    --print (1)
-    --print (parsePerson "abc")
-    --print (hair (fromJust person))
-    print (initialGuess )
-
-
-    -- Unit test for feedback  
-    let c1 = ["SBM", "SBF"]
-        l1 = ["SBM", "TRF"]
-        c2 = ["SBM", "SBF"]
-        l2 = ["TRF", "SBM"]
-        c3 = ["SBM", "SBF"]
-        l3 = ["TRF", "TRM"]
-        c4 = ["SBM", "TDF"]
-        l4 = ["TRF", "SDM"]
-    print (parsePerson "abc")
-    print (feedback c1 l1 ) 
-    --print (c1, l1)
-    print $ feedback c2 l2
-    --print (c2, l2)
-    print $ feedback c3 l3
-    --print (c3, l3)
-    print $ feedback c4 l4
-    --print (c4, l4)
