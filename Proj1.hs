@@ -59,7 +59,9 @@ initialGuess = (initialGuess, state)
       
 ------------------------------------------------------------------------------
 -- Return the score given two inputs(guesses). Basically describe the accuracy
--- of the guess. 
+-- of the guess. A total correct means that all height, hair and gender are 
+-- the same. If there is a total correct, then it will not be considered 
+-- as a partial correct. 
 
 feedback :: Guess -> Guess -> Score
 feedback culprits lineups = 
@@ -80,25 +82,8 @@ feedback culprits lineups =
         length (deleteFirstsBy (areTheSame sex) culprits lineups)
         
 ------------------------------------------------------------------------------
-
-
--- Person:: [Char]
--- [Person] :: [[Char]]
--- GameState :: [Person]  == [[Char]]
-
-bestGuess :: Guess -> GameState -> Guess
-bestGuess lastGuess state = bestguess
-  where 
-    scoreList = [(guess, utilityScore)| guess <- state, 
-      let utilityScore = utility lastGuess state ]
-    guesses = sortBy (compare `on` snd)  scoreList
-    bestguess = fst $ head guesses
-
-
-
-------------------------------------------------------------------------------
-
-
+-- Select the next guess from the updated state, given the last guess and 
+-- last score. 
 nextGuess :: ([Person],GameState) -> Score -> ([Person],GameState)
 nextGuess (lastGuess, state) score = (newGuess, newState)
   where 
@@ -126,12 +111,12 @@ selectGuess state = bestGuess -- The first one is the most effective.
     bestGuess = fst (head guesses)
     -- Sort all remaining choices based on the effeciency. 
 
--- Simply compute expected number of remaining possible lineups for each guess
--- by grouping guesses with the same feedback(scores).
--- The smaller the number is, the more efficient the reduction is. 
--- totslScores is [Score] after sorting and grouping, the number of the 
--- same score will be calculated. 
 ------------------------------------------------------------------------------
+-- Calculate the expected number of possible guesses will remain after the 
+-- guess that you made. Group the result that have the same score and divided
+-- by the total possibilities times the group number. This is the efficiency 
+-- score for one guess. Calculate the utility score for each guess and sort
+-- them. The fewer score it has, the more efficient the guess is. 
 
 utility :: Guess -> GameState -> Double
 utility lastGuess state =  sum [(numPos / total) * numPos| g<- groupedScores, 
