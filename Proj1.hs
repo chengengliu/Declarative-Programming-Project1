@@ -52,12 +52,12 @@ sex (h:hc:s:[]) = s
 
 initialGuess :: ([Person], GameState)
 initialGuess = (initialGuess, state)
-         where
-          people = [fromJust (parsePerson (h ++ hc ++ s))
-            | h <-["S", "T"],hc <-["B", "R", "D"],s  <-["M", "F"]]
-          allStates = [[a,b]| a<-people, b<- people, a<b]     
-          initialGuess = ["SBM", "TRM"]
-          state = allStates \\ [initialGuess]
+        where
+        people = [fromJust (parsePerson (h ++ hc ++ s))
+          | h <-["S", "T"],hc <-["B", "R", "D"],s  <-["M", "F"]]
+        allStates = [[a,b]| a<-people, b<- people, a<b]     
+        initialGuess = ["SBM", "TRM"]
+        state = allStates \\ [initialGuess]
       
 ------------------------------------------------------------------------------
 -- Return the score given two inputs(guesses). Basically describe the accuracy
@@ -111,8 +111,8 @@ selectGuess state = bestGuess -- The first one is the most effective.
       let utilityScore = utility guess state]
     guesses = sortBy(compare `on` snd ) candidates 
     bestGuess = fst (head guesses)
-    -- Sort all remaining choices based on the effeciency. 
-
+    -- Sort all remaining choices based on the effeciency.
+                        
 ------------------------------------------------------------------------------
 -- Calculate the expected number of possible guesses that will be left after  
 -- you made your guess. Group the result that have the same score and divided
@@ -129,7 +129,7 @@ utility lastGuess state =  sum [(numPos / total) * numPos| g<- groupedScores,
     totalScores = [score | guess <- state, 
       let score = feedback lastGuess guess]
     total = (fromIntegral . length ) state
-    groupedScores = (group . sort ) totalScores 
+    groupedScores = (group . sort ) totalScores         
 
 ------------------------------------------------------------------------------
 -- Given two lists and the postion we are interested in, return true
