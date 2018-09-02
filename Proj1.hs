@@ -10,12 +10,12 @@
 -- for the guess. The 'nextGuess' will generate the next best guess based
 -- on the last guess and the remaining possible guesses' performance. There 
 -- are several helper functions for the 'nextGuess' function in order to get
--- a more precise guess. 
+-- a more precise prediction. 
 
 -- The data structure used in the program are 'Person', 'Guess', 'GameState'
 -- and 'Score'. Person is simply a list of char(String). It is used to 
 -- store each charactistic of the person. Guess is a list of Person ([Person])
--- where Guess is suppossed to include two Persons at a time. GameStae is a 
+-- while also including two Persons at a time. GameState is a 
 -- list of Guess ([Guess]), which should include the remaining possible 
 -- guesses. 
 
@@ -31,8 +31,9 @@ type Person = String  -- [Char]
 type Guess = [Person] -- [[Char]] == [String ]
 type GameState = [Guess] -- [[[Char]]]  == [[Person]]
 type Score = (Int, Int, Int, Int)
+
 ------------------------------------------------------------------------------
--- Helper Function.
+-- Side function.
 -- Given a string and transform the string into a 'Person' 
 parsePerson :: String -> Maybe Person 
 parsePerson [] = Nothing
@@ -113,11 +114,13 @@ selectGuess state = bestGuess -- The first one is the most effective.
     -- Sort all remaining choices based on the effeciency. 
 
 ------------------------------------------------------------------------------
--- Calculate the expected number of possible guesses will remain after the 
--- guess that you made. Group the result that have the same score and divided
+-- Calculate the expected number of possible guesses that will be left after  
+-- you made your guess. Group the result that have the same score and divided
 -- by the total possibilities times the group number. This is the efficiency 
 -- score for one guess. Calculate the utility score for each guess and sort
 -- them. The fewer score it has, the more efficient the guess is. 
+-- Note that here 'fromIntegral' is necessary since we need division to 
+-- calculate the percentage. 
 
 utility :: Guess -> GameState -> Double
 utility lastGuess state =  sum [(numPos / total) * numPos| g<- groupedScores, 
@@ -128,11 +131,9 @@ utility lastGuess state =  sum [(numPos / total) * numPos| g<- groupedScores,
     total = (fromIntegral . length ) state
     groupedScores = (group . sort ) totalScores 
 
- 
 ------------------------------------------------------------------------------
 -- Given two lists and the postion we are interested in, return true
 -- If and only if the nth element in two lists are the same. 
   
 areTheSame :: Int -> Person -> Person -> Bool
 areTheSame n first second  =  (first !! n) == (second !! n )
-
