@@ -2,7 +2,7 @@
 
 ## This is the project 1 for Declarative Programming. 
 
-[extract from a Maybe Clase](https://stackoverflow.com/questions/4940349/how-to-get-the-value-of-an-maybe-in-haskell)
+For more information about the proejct, please sse the description pdf file
 
 get a total 95/100. 
 Code correctness and effeiciency 70/70
